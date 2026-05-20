@@ -5,7 +5,7 @@ public class CharacterMovement : MonoBehaviour
 {
     [SerializeField]private CharacterController cc_;
     [SerializeField]private float speed = 10f; // 플레이어 스피드
-    [SerializeField]private float mouseSensitive = 100f;
+    [SerializeField]private float mouseSensitive = 0.5f;
     [SerializeField]private Transform PlayerCamera;
 
     private float xRotation = 0f; // 캐릭터 방향 조정
@@ -32,8 +32,8 @@ public class CharacterMovement : MonoBehaviour
     public void OnLook(InputAction.CallbackContext ctx)
     {
         Vector2 lookInput = ctx.ReadValue<Vector2>();
-        float mouseX = lookInput.x * mouseSensitive * Time.deltaTime;
-        float mouseY = lookInput.y * mouseSensitive * Time.deltaTime;
+        float mouseX = lookInput.x * mouseSensitive;
+        float mouseY = lookInput.y * mouseSensitive;
 
         // 마우스 좌우 회전
         transform.Rotate(Vector3.up * mouseX);

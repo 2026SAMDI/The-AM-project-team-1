@@ -6,7 +6,7 @@ public class playerShot : MonoBehaviour
     [SerializeField]private float shotRange = 50f;
     [SerializeField]private Camera playerFPSCam;
     [SerializeField]private LayerMask target; //없앨 타겟 조사
-    void Update()
+    private void Update()
     {
         if (Mouse.current.leftButton.wasPressedThisFrame)// 마우스를 눌렀을때
         {
@@ -14,7 +14,7 @@ public class playerShot : MonoBehaviour
         }
     }
 
-    public void shot()
+    private void shot()
     {
         Ray ray = playerFPSCam.ScreenPointToRay(Mouse.current.position.ReadValue()); // 플레이어 캠에서 레이저 발사
         RaycastHit hit;

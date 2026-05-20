@@ -7,14 +7,14 @@ public class Timer : MonoBehaviour
     private float inGameTimer = 60f; // 1분 = 60초
     private bool isRunning = false;
 
-    void Start()
+    private void Start()
     {
         startTimer(); // 타이머 시작
     }
 
-    void Update()
+    private void Update()
     {
-        if(isRunning == true)
+        if(isRunning)
         {
             if (inGameTimer <= 0)
             {
