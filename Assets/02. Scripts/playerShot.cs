@@ -6,17 +6,12 @@ public class playerShot : MonoBehaviour
     [SerializeField]private float shotRange = 50f;
     [SerializeField]private Camera playerFPSCam;
     [SerializeField]private LayerMask target; //없앨 타겟 조사
-    private void Update()
-    {
-        if (Mouse.current.leftButton.wasPressedThisFrame)// 마우스를 눌렀을때
-        {
-            shot(); // 총 발사 신호 주기
-        }
-    }
 
-    private void shot()
+    // InputSystem으로 제작
+    public void OnShot(InputAction.CallbackContext ctx)
     {
-        Ray ray = playerFPSCam.ScreenPointToRay(Mouse.current.position.ReadValue()); // 플레이어 캠에서 레이저 발사
+        Ray ray = playerFPSCam.ScreenPointToRay(Mouse.current.position.ReadValue());// 플레이어 캠에서 레이저 발사
+        
         RaycastHit hit;
 
         if (Physics.Raycast(ray,out hit, shotRange,target)) // 타겟 레이어가 맞았다면
