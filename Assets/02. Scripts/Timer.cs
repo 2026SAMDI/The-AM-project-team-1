@@ -29,7 +29,7 @@ public class Timer : MonoBehaviour
             text.text = string.Format("{0:0}:{1:00}",minute,second);
         }
     }
-    public void startTimer(){isRunning = true;}
+    public void startTimer() => isRunning = true;
     public void pauseTimer()
     {
         isRunning = false;
