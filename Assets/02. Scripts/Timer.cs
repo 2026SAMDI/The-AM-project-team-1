@@ -7,9 +7,9 @@ public class Timer : MonoBehaviour
     private float inGameTimer = 60f; // 1분 = 60초
     private bool isRunning = false;
 
-    private void Start()
+    public void countdownEnd() // Startcountdown의 카운트 다운 끝날때 시작
     {
-        startTimer(); // 타이머 시작
+        startTimer(); 
     }
 
     private void Update()
@@ -29,13 +29,13 @@ public class Timer : MonoBehaviour
             text.text = string.Format("{0:0}:{1:00}",minute,second);
         }
     }
-    public void startTimer() => isRunning = true;
-    public void pauseTimer()
+    public void startTimer() => isRunning = true; // 타이머 시작
+    public void pauseTimer() // 타이머 끝(정지)
     {
         isRunning = false;
         text.text = "0:00";
     }
-    public void resetTimer()
+    public void resetTimer() //  타이머 리셋 (아직 쓸곳이 없네)
     {
         inGameTimer = 60f;
         isRunning = true;
