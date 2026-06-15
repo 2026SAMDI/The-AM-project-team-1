@@ -5,7 +5,7 @@ public class CharacterMovement : MonoBehaviour
 {
     [SerializeField]private CharacterController cc_;
     [SerializeField]private float speed = 10f; // 플레이어 스피드
-    [SerializeField]private float mouseSensitive = 0.5f;
+    private float mouseSensitive = 0.5f;
     [SerializeField]private Transform PlayerCamera;
 
     private float xRotation = 0f; // 캐릭터 방향 조정
@@ -16,6 +16,9 @@ public class CharacterMovement : MonoBehaviour
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        mouseSensitive = PlayerPrefs.GetFloat("Sensitivity",0.5f);
+
     }
     // 캐릭터 움직인 구현 로직
     public void OnMove(InputAction.CallbackContext ctx)

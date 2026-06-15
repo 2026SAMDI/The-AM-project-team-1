@@ -11,8 +11,8 @@ using UnityEngine.UI;
 public class ExampleUsage : MonoBehaviour
 {
     [Header("회원가입 / 로그인 입력")]
-    public InputField userIdField;
-    public InputField passwordField;
+    public TMP_InputField userIdField;
+    public TMP_InputField passwordField;
     public TextMeshProUGUI statusText;
  
     [Header("리더보드 표시")]
