@@ -10,7 +10,8 @@ public class MenuManager : MonoBehaviour
 
     [Header("--- Main Menu UI ---")]
     [SerializeField] private TMP_InputField nicknameInputField;
-
+    [SerializeField] private TMP_InputField passwordInputField;
+    [SerializeField] private Button playButton;
     [Header("--- Settings UI ---")]
     [SerializeField] private Slider sensitivitySlider;
     [SerializeField] private TMP_Text sensitivityText;
@@ -20,6 +21,8 @@ public class MenuManager : MonoBehaviour
         mainMenuPanel.SetActive(true);
         settingsPanel.SetActive(false);
 
+        OnInputChanged("");
+        passwordInputField.onValueChanged.AddListener(OnInputChanged);
 
         float savedSensitivity = PlayerPrefs.GetFloat("Sensitivity", 1.0f);
         if (sensitivitySlider != null)
@@ -35,14 +38,24 @@ public class MenuManager : MonoBehaviour
             sensitivitySlider.onValueChanged.AddListener(OnSensitivityChanged);
         }
     }
-
+    private void OnInputChanged(string text)
+    {
+        playButton.interactable = !string.IsNullOrWhiteSpace(text);
+    }
     public void OnClickPlay()
     {
         string nickname = nicknameInputField.text;
+        string password = passwordInputField.text;
         if (string.IsNullOrEmpty(nickname)) nickname = "Player";
+        if (string.IsNullOrEmpty(password))
+        {
+            Debug.Log("비밀번호가 입력되지 않았습니다!");
+            return;
+        }
         PlayerPrefs.SetString("PlayerNickname", nickname);
         PlayerPrefs.Save();
         Debug.Log($"[로그] 게임 시작! 닉네임: {nickname}");
+
     }
 
     public void OnClickOpenSettings()
@@ -75,7 +88,6 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-            
             Debug.LogError("[에러] Sensitivity Text 칸이 비어있습니다! 인스펙터 창을 확인하세요.");
         }
     }

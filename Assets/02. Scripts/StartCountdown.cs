@@ -4,7 +4,7 @@ using UnityEngine;
 public class StartCountdown : MonoBehaviour
 {
     public static bool canClick {get; private set;}
-    [SerializeField]private float countdown = 3f;
+    [SerializeField]private float countdown = 5f;
     [SerializeField]private TextMeshProUGUI countdownText;
     [SerializeField]private Timer timer;
     private bool isRunning = false;
@@ -17,15 +17,17 @@ public class StartCountdown : MonoBehaviour
 
     public void Update() // 매 프레임마다 실행
     {
+        if(!isRunning) return;
+
         if(isRunning)
         {
+            countdown -= Time.deltaTime;
+
+            int second = Mathf.CeilToInt(countdown);
             if (countdown <= 0)
             {
                 countdownPause();
             }
-            countdown -= Time.deltaTime;
-
-            int second = Mathf.FloorToInt(countdown % 60);
 
             countdownText.text = $"{second}";
             
@@ -36,10 +38,14 @@ public class StartCountdown : MonoBehaviour
     {
         isRunning = false;
 
-        timer.countdownEnd();
-        countdownText.text = "Start!";
+        if (timer != null) timer.countdownEnd();
         canClick =true;
 
-        Destroy(countdownText.gameObject);
+        if (countdownText != null)
+        {
+            countdownText.text = "Start!";
+            Destroy(countdownText.gameObject);
+        }
+        this.enabled = false;
     }
 }
