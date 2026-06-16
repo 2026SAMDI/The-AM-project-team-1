@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement; // 씬 이동을 위해 추가!
 
 public class MenuManager : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class MenuManager : MonoBehaviour
     [Header("--- Main Menu UI ---")]
     [SerializeField] private TMP_InputField nicknameInputField;
     [SerializeField] private Button playButton;
+    
     [Header("--- Settings UI ---")]
     [SerializeField] private Slider sensitivitySlider;
     [SerializeField] private TMP_Text sensitivityText;
@@ -27,25 +29,28 @@ public class MenuManager : MonoBehaviour
             UpdateSensitivityText(savedSensitivity);
         }
         
-        
         if (sensitivitySlider != null)
         {
             sensitivitySlider.onValueChanged.RemoveAllListeners(); 
             sensitivitySlider.onValueChanged.AddListener(OnSensitivityChanged);
         }
     }
-    private void OnInputChanged(string text)
-    {
-        playButton.interactable = !string.IsNullOrWhiteSpace(text);
-    }
+
+    // ★★★ [수정] 게임 시작 버튼을 누르면 발동하는 함수
     public void OnClickPlay()
     {
-        string nickname = nicknameInputField.text;
+        string nickname = nicknameInputField.text.Trim();
+        
+        // 만약 빈칸이면 기본값으로 "Player" 지정
         if (string.IsNullOrEmpty(nickname)) nickname = "Player";
+        
+        // 1. 하드디스크에 "PlayerNickname"이라는 열쇠로 저장!
         PlayerPrefs.SetString("PlayerNickname", nickname);
         PlayerPrefs.Save();
-        Debug.Log($"[로그] 게임 시작! 닉네임: {nickname}");
+        Debug.Log($"[로그] 이름 저장 완료! 닉네임: {nickname}");
 
+        // 2. 저장하자마자 즉시 인게임 씬으로 다이렉트 이동!
+        SceneManager.LoadScene("AM_MainScene");
     }
 
     public void OnClickOpenSettings()
@@ -59,13 +64,10 @@ public class MenuManager : MonoBehaviour
         mainMenuPanel.SetActive(true);
         settingsPanel.SetActive(false);
     }
-
     
     public void OnSensitivityChanged(float value)
     {
-        
         Debug.Log($"[로그] 슬라이더 움직임 감지됨! 현재 값: {value}");
-
         PlayerPrefs.SetFloat("Sensitivity", value);
         UpdateSensitivityText(value);
     }

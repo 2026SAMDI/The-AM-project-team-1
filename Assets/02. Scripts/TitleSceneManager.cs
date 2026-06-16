@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TitleSceneManager : MonoBehaviour
 {
@@ -34,34 +35,29 @@ public class TitleSceneManager : MonoBehaviour
     // ===== [게임 시작] 버튼 누를 때 =====
     public void OnClickStartGame()
     {
-        string nickname = nicknameField.text.Trim();
+string nickname = nicknameField.text.Trim();
 
-        if (string.IsNullOrWhiteSpace(nickname))
+    if (string.IsNullOrWhiteSpace(nickname))
+    {
+        if (statusText != null) statusText.text = "이름을 입력해야 시작할 수 있습니다.";
+        return;
+    }
+
+    // ★ [치트키] 서버에 물어보기도 전에 가방에 이름을 먼저 콱 박아버립니다!
+    // 이렇게 하면 서버가 터지든 말든 인게임에는 무조건 내 이름이 뜹니다.
+    PlayerSession.UserId = nickname; 
+    Debug.Log($"[로그] 버튼 클릭 즉시 가방 저장 완료: {PlayerSession.UserId}");
+
+    if (statusText != null) statusText.text = "서버 접속 중...";
+
+    // 그 다음 서버 통신을 보냅니다.
+    ServerManagement.Instance.Register(nickname, DummyPassword, (regSuccess, regMsg) =>
+    {
+        ServerManagement.Instance.Login(nickname, DummyPassword, (loginSuccess, loginMsg) =>
         {
-            if (statusText != null) statusText.text = "이름을 입력해야 시작할 수 있습니다.";
-            return;
-        }
-
-        if (statusText != null) statusText.text = "Server Connecting...";
-
-        // [우회 로직] 
-        // 1단계: 먼저 이 이름으로 서버에 회원가입을 찔러봅니다.
-        ServerManagement.Instance.Register(nickname, DummyPassword, (regSuccess, regMsg) =>
-        {
-            // 가입 성공했거나, 이미 존재하는 이름이라도 상관없이 바로 2단계 로그인을 시도합니다.
-            ServerManagement.Instance.Login(nickname, DummyPassword, (loginSuccess, loginMsg) =>
-            {
-                if (loginSuccess)
-                {
-                    Debug.Log($"[로그] '{nickname}'님 환영합니다. 게임 씬으로 이동!");
-                    SceneManager.LoadScene("AM_MainScene");
-                }
-                else
-                {
-                    if (statusText != null) statusText.text = "Connecting failed : " + loginMsg;
-                }
-            });
+            SceneManager.LoadScene("AM_MainScene");
         });
+    });
     }
 
     // ===== [리더보드 보기] 버튼 누를 때 =====
@@ -77,6 +73,7 @@ public class TitleSceneManager : MonoBehaviour
     {
         leaderboardPanel.SetActive(false);
         mainMenuPanel.SetActive(true); 
+        statusText.text = "";
     }
  
     // ===== 리더보드 창의 [새로고침] 버튼 누를 때 =====
@@ -122,28 +119,41 @@ if (statusText != null)
     private void DrawLeaderboard(List<LeaderboardEntry> skiers)
     {
         // 기존 랭킹 UI들 싹 청소
-        foreach (Transform child in leaderboardContent)
-        {
-            child.SetParent(null);
-            Destroy(child.gameObject);
-        }
+// [안전장치] 부모 오브젝트가 비어있으면 중단
+    if (leaderboardContent == null)
+    {
+        Debug.LogError("[🚨 에러] 'Leaderboard Content' 칸이 비어있습니다!");
+        return;
+    }
+
+    if (leaderboardRowPrefab == null)
+    {
+        Debug.LogError("[🚨 에러] 'Leaderboard Row Prefab' 칸이 비어있습니다!");
+        return;
+    }
+
+    // 🔥 [버그 박멸 핵심 코스] 기존 랭킹 리스트 완벽 청소
+    // 자식 오브젝트가 0개가 될 때까지 맨 위에 있는 녀석(0번)을 무조건 즉시 파괴합니다.
+    // 이 방식을 쓰면 인덱스가 밀려서 안 지워지는 UI가 절대 생기지 않습니다.
+    while (leaderboardContent.childCount > 0)
+    {
+        DestroyImmediate(leaderboardContent.GetChild(0).gameObject);
+    }
  
-        if (skiers == null || skiers.Count == 0)
-        {
-            if (statusText != null) statusText.text = "No Ranking";
-            return;
-        }
+    // 데이터가 없는 경우 처리
+    if (skiers == null || skiers.Count == 0)
+    {
+        if (statusText != null) statusText.text = "No LeaderBoard";
+        return;
+    }
 
-        if (statusText != null) statusText.text = "Reroll LeaderBoard";
+    if (statusText != null) statusText.text = "Update LeaderBoard";
 
-        // [이름 + 점수 세트로 띄우기]
-        // 서버에서 받아온 skiers 배열을 돌면서 등수, 유저ID(이름), 하이스코어 점수를 한 줄로 조합해 찍어줍니다.
-        for (int i = 0; i < skiers.Count; i++)
-        {
-            TextMeshProUGUI row = Instantiate(leaderboardRowPrefab, leaderboardContent);
-            
-            // 문자열 포맷을 활용하여 깔끔하게 이름과 점수를 매칭합니다.
-            row.text = $"{i + 1}.   {skiers[i].userId}   ({skiers[i].highScore}p)";
+    // 3. 새 랭킹 목록 깔끔하게 다시 그리기
+    for (int i = 0; i < skiers.Count; i++)
+    {
+        TextMeshProUGUI row = Instantiate(leaderboardRowPrefab, leaderboardContent);
+        row.text = $"{i + 1}.  {skiers[i].userId}  -  {skiers[i].highScore} point";
+    };
         }
     }
-}

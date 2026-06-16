@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class ScoreManagement : MonoBehaviour
 {
-    [SerializeField]private TextMeshProUGUI text;
-    [SerializeField]private int targetScore = 100; // 타겟 맞출때마다 점수
-    [SerializeField]private int missScore = 50; //빗맞출시 점수
+    [SerializeField] private TextMeshProUGUI text;
+    [SerializeField] private int targetScore = 100; 
+    [SerializeField] private int missScore = 50; 
     private int currentScore = 0; // 현재 점수
 
     private void Awake()
@@ -19,17 +19,24 @@ public class ScoreManagement : MonoBehaviour
 
     private void UpdateUI()
     {
-        text.text = $"Score: {currentScore}"; // TMPtext에 출력 
+        text.text = $"Score: {currentScore}"; 
     }
+    
     public void ScoreRaised()
     {
-        currentScore += targetScore; // 맞추면 점수 추가
-        UpdateUI();
-    }
-    public void Scoredown()
-    {
-        currentScore -= missScore; // 클릭미스시 점수 감소
+        currentScore += targetScore; 
         UpdateUI();
     }
     
+    public void Scoredown()
+    {
+        currentScore -= missScore; 
+        UpdateUI();
+    }
+
+    // 🔥 [추가] 외부에서 최종 점수를 안전하게 읽어갈 수 있도록 통로를 열어줍니다.
+    public int GetFinalScore()
+    {
+        return currentScore;
+    }
 }
