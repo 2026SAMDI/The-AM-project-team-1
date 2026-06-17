@@ -7,30 +7,28 @@ using UnityEngine.UI;
 public class TitleSceneManager : MonoBehaviour
 {
     [Header("--- 패널 오브젝트 설정 ---")]
-    [SerializeField] private GameObject mainMenuPanel;     // 1. 메인 메뉴 패널 (첫 화면)
+    [SerializeField] private GameObject mainMenuPanel;     // 1. 메인 메뉴 패널 
     [SerializeField] private GameObject leaderboardPanel;  // 2. 리더보드 패널
 
     [Header("--- 닉네임 입력 UI ---")]
-    [SerializeField] private TMP_InputField nicknameField; // [수정] 이름만 받는 인풋필드
+    [SerializeField] private TMP_InputField nicknameField; // 이름만 받는 인풋필드
     [SerializeField] private TextMeshProUGUI statusText;   // 안내 메시지용
 
     [Header("--- 리더보드 UI (이름 + 점수 표시) ---")]
-    [SerializeField] private Transform leaderboardContent;         // 세로 Layout Group 부모
-    [SerializeField] private TextMeshProUGUI leaderboardRowPrefab; // 한 줄짜리 Text 프리팹
+    [SerializeField] private Transform leaderboardContent;         // 리더보드
+    [SerializeField] private TextMeshProUGUI leaderboardRowPrefab; // Text 프리펩
 
     // 내부적으로 서버 인증을 통과하기 위한 가짜 비밀번호 고정값
     private const string DummyPassword = "DefaultPassword!!!";
 
     private void Start()
     {
-        // 게임을 켜면 메인 메뉴판(입력창이 있는 곳)을 바로 보여줍니다.
+        // 게임을 켜면 메인메뉴 보여주게 함
         mainMenuPanel.SetActive(true);
         leaderboardPanel.SetActive(false); 
     }
 
-    // =================================================================
-    // 📢 BUTTON EVENTS (유니티 버튼 UI에 연결하는 함수들)
-    // =================================================================
+    //BUTTON EVENTS (유니티 버튼 UI에 연결하는 함수들)
 
     // ===== [게임 시작] 버튼 누를 때 =====
     public void OnClickStartGame()
@@ -43,14 +41,13 @@ string nickname = nicknameField.text.Trim();
         return;
     }
 
-    // ★ [치트키] 서버에 물어보기도 전에 가방에 이름을 먼저 콱 박아버립니다!
-    // 이렇게 하면 서버가 터지든 말든 인게임에는 무조건 내 이름이 뜹니다.
+    // 서버에 물어보기 전에 닉네임 먼저 설정 -> 이러면 서버없어도 내 이름 뜸
     PlayerSession.UserId = nickname; 
     Debug.Log($"[로그] 버튼 클릭 즉시 가방 저장 완료: {PlayerSession.UserId}");
 
     if (statusText != null) statusText.text = "서버 접속 중...";
 
-    // 그 다음 서버 통신을 보냅니다.
+    // 서버 통신 보냄
     ServerManagement.Instance.Register(nickname, DummyPassword, (regSuccess, regMsg) =>
     {
         ServerManagement.Instance.Login(nickname, DummyPassword, (loginSuccess, loginMsg) =>
@@ -60,7 +57,7 @@ string nickname = nicknameField.text.Trim();
     });
     }
 
-    // ===== [리더보드 보기] 버튼 누를 때 =====
+    // LeaderBoard 클릭
     public void OnClickOpenLeaderboard()
     {
         mainMenuPanel.SetActive(false);
@@ -68,24 +65,18 @@ string nickname = nicknameField.text.Trim();
         RefreshLeaderboardData(); // 열릴 때 자동으로 최신 순위 로드
     }
 
-    // ===== 리더보드 창의 [닫기] 버튼 누를 때 =====
+    // LeaderBoard 닫기 클릭
     public void OnClickCloseLeaderboard()
     {
         leaderboardPanel.SetActive(false);
         mainMenuPanel.SetActive(true); 
-        statusText.text = "";
+        statusText.text = ""; // 상태 텍스트 공백
     }
- 
-    // ===== 리더보드 창의 [새로고침] 버튼 누를 때 =====
+
     public void OnClickRefreshButton()
     {
         RefreshLeaderboardData();
     }
-
-
-    // =================================================================
-    // 🔒 PRIVATE METHODS (내부 로직)
-    // =================================================================
  
     private void RefreshLeaderboardData()
     {
@@ -95,13 +86,13 @@ if (statusText != null)
     }
     else
     {
-        Debug.Log("[로그] statusText가 연결되지 않았지만 리더보드를 계속 로드합니다.");
+        Debug.Log("statusText가 연결되지 않음, 그래도 연결 중...");
     }
     
-    // 2. ServerManagement가 실제로 씬에 있는지 최종 검문
+    // ServerManagement가 씬에 있는지 확인
     if (ServerManagement.Instance == null)
     {
-        Debug.LogError("[🚨 에러] 씬에 ServerManagement 오브젝트가 없습니다! 하이어라키 창을 확인하세요.");
+        Debug.LogError("Scene에 ServerManagement 오브젝트가 없음");
         return;
     }
 
@@ -109,30 +100,30 @@ if (statusText != null)
         skiers => DrawLeaderboard(skiers),
         error => 
         { 
-            // 여기도 안전장치 추가
+            // 안전장치 -> statusText가 없을때 로드 실패 뜨게함
             if (statusText != null) statusText.text = "LoadFailed: " + error; 
             Debug.LogError("리더보드 로드 실패: " + error);
         });
     }
  
-    // 서버에서 온 데이터 리스트를 받아와 이름과 점수를 세트로 화면에 띄우는 코드입니다.
+    // 서버에서 온 데이터 리스트를 받아와 이름과 점수를 세트로 화면에 띄우는 코드
     private void DrawLeaderboard(List<LeaderboardEntry> skiers)
     {
-        // 기존 랭킹 UI들 싹 청소
-// [안전장치] 부모 오브젝트가 비어있으면 중단
+        // 기존 랭킹 UI 삭제
+        // 부모 오브젝트가 비어있으면 중단
     if (leaderboardContent == null)
     {
-        Debug.LogError("[🚨 에러] 'Leaderboard Content' 칸이 비어있습니다!");
+        Debug.LogError("Leaderboard Content 칸이 비어있음");
         return;
     }
 
     if (leaderboardRowPrefab == null)
     {
-        Debug.LogError("[🚨 에러] 'Leaderboard Row Prefab' 칸이 비어있습니다!");
+        Debug.LogError("Leaderboard Row Prefab 칸이 비어있음");
         return;
     }
 
-    // 🔥 [버그 박멸 핵심 코스] 기존 랭킹 리스트 완벽 청소
+    //기존 랭킹 리스트 완벽 청소
     // 자식 오브젝트가 0개가 될 때까지 맨 위에 있는 녀석(0번)을 무조건 즉시 파괴합니다.
     // 이 방식을 쓰면 인덱스가 밀려서 안 지워지는 UI가 절대 생기지 않습니다.
     while (leaderboardContent.childCount > 0)
