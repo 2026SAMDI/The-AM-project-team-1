@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement; // 씬 이동을 위해 추가!
+using UnityEngine.SceneManagement; // 씬 이동을 위해 추가
 
 public class MenuManager : MonoBehaviour
 {
@@ -36,7 +36,7 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    // ★★★ [수정] 게임 시작 버튼을 누르면 발동하는 함수
+    //게임 시작 버튼을 누르면 발동하는 함수
     public void OnClickPlay()
     {
         string nickname = nicknameInputField.text.Trim();
@@ -44,12 +44,12 @@ public class MenuManager : MonoBehaviour
         // 만약 빈칸이면 기본값으로 "Player" 지정
         if (string.IsNullOrEmpty(nickname)) nickname = "Player";
         
-        // 1. 하드디스크에 "PlayerNickname"이라는 열쇠로 저장!
+        // 하드디스크에 "PlayerNickname"이라는 열쇠로 저장
         PlayerPrefs.SetString("PlayerNickname", nickname);
         PlayerPrefs.Save();
         Debug.Log($"[로그] 이름 저장 완료! 닉네임: {nickname}");
 
-        // 2. 저장하자마자 즉시 인게임 씬으로 다이렉트 이동!
+        // 저장하자마자 즉시 인게임 Scene으로 이동
         SceneManager.LoadScene("AM_MainScene");
     }
 
