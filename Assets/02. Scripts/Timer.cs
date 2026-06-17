@@ -62,31 +62,31 @@ public class Timer : MonoBehaviour
         isRunning = false;
         text.text = "0:00";
 
-        // 🔥 타이머가 끝나면 결과창을 보여주고 서버에 저장합니다!
+        // 타이머가 끝나면 결과창을 보여주고 서버에 저장
         ShowResultAndSubmit();
     }
 
     private void ShowResultAndSubmit()
     {
-        // 1. 점수와 정확도 데이터 긁어오기
+        //점수와 정확도 데이터 긁어오기
         int finalScore = scoreManagement.GetFinalScore();
-        float finalAccuracy = accuracySystem.accuracyFormula(); // AccuracySystem의 공식 함수 호출!
+        float finalAccuracy = accuracySystem.accuracyFormula(); // AccuracySystem의 함수 호출
         string myNickname = PlayerPrefs.GetString("PlayerNickname", "Player");
 
         Debug.Log($"[게임 종료] {myNickname} - 점수: {finalScore} / 정확도: {finalAccuracy:F1}%");
 
-        // 2. 꽁꽁 숨겨놨던 결과창 패널을 화면에 짠! 하고 켭니다.
+        // 결과창 패널을 화면에 띄움
         if (resultPanel != null) resultPanel.SetActive(true);
 
-        // 3. 결과창 텍스트에 최종 데이터 이쁘게 채워넣기
+        // 결과창 텍스트에 최종 데이터를 출력
         if (finalScoreText != null) finalScoreText.text = $"Final Score: {finalScore} point";
         if (finalAccuracyText != null) finalAccuracyText.text = $"Accuracy: {finalAccuracy:F1} %";
 
-        // 4. 마우스 락 풀기 (게임 중에 마우스를 가려놨으니 결과창 누르려면 다시 풀어줘야 합니다)
+        // 마우스 락 풀기 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        // 5. 백그라운드에서 서버에 점수 전송하기
+        // 백그라운드에서 서버에 점수 전송하기
         if (ServerManagement.Instance != null)
         {
             string dummyPassword = "defaultPassword123!";

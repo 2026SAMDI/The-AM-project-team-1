@@ -5,9 +5,7 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
  
-// =========================
 // 서버 요청 데이터 (UserRequest.java 대응)
-// =========================
 [Serializable]
 public class UserRequestData
 {
@@ -23,9 +21,7 @@ public class UserRequestData
     }
 }
  
-// =========================
 // 리더보드 한 줄 (LeaderboardResponse.java 대응)
-// =========================
 [Serializable]
 public class LeaderboardEntry
 {
@@ -33,18 +29,14 @@ public class LeaderboardEntry
     public int highScore;
 }
  
-// =========================
 // 리더보드 전체 응답 (LeaderboardResult.java 대응)
-// =========================
 [Serializable]
 public class LeaderboardResult
 {
     public List<LeaderboardEntry> skiers;
 }
- 
-// =========================
+
 // 로그인한 유저 정보 (점수 제출 시 재사용)
-// =========================
 public static class PlayerSession
 {
     public static string UserId;
@@ -59,10 +51,8 @@ public static class PlayerSession
     }
 }
  
-// =========================
 // 서버 통신 매니저
-// 빈 GameObject에 붙여서 씬에 하나만 두고 사용하세요.
-// =========================
+
 public class ServerManagement : MonoBehaviour
 {
     public static ServerManagement Instance { get; private set; }
@@ -85,9 +75,7 @@ public class ServerManagement : MonoBehaviour
         }
     }
  
-    // =========================
     // 회원가입 (/register)
-    // =========================
     public void Register(string userId, string password, Action<bool, string> onComplete)
     {
         var data = new UserRequestData(userId, password);
@@ -98,9 +86,7 @@ public class ServerManagement : MonoBehaviour
         }));
     }
  
-    // =========================
     // 로그인 (/login)
-    // =========================
     public void Login(string userId, string password, Action<bool, string> onComplete)
     {
         var data = new UserRequestData(userId, password);
@@ -119,10 +105,8 @@ public class ServerManagement : MonoBehaviour
         }));
     }
  
-    // =========================
     // 점수 제출 (/submit-score)
     // 서버 구조상 매 요청마다 userId/password로 본인 확인 후 비교/저장합니다.
-    // =========================
     public void SubmitScore(int score, Action<bool, string> onComplete)
     {
         if (!PlayerSession.IsLoggedIn)
@@ -138,10 +122,8 @@ public class ServerManagement : MonoBehaviour
         }));
     }
  
-    // =========================
     // 리더보드 조회 (/leaderboard)
-    // 서버에서 highScore 내림차순으로 정렬되어 옵니다.
-    // =========================
+    // 서버에서 highScore 내림차순으로 정렬
     public void GetLeaderboard(Action<List<LeaderboardEntry>> onComplete, Action<string> onError = null)
     {
         StartCoroutine(Get("/leaderboard", (ok, body) =>
@@ -157,9 +139,7 @@ public class ServerManagement : MonoBehaviour
         }));
     }
  
-    // =========================
     // 공통 POST 요청 (application/json)
-    // =========================
     private IEnumerator Post(string endpoint, object payload, Action<bool, string> onComplete)
     {
         string json = JsonUtility.ToJson(payload);
@@ -185,9 +165,7 @@ public class ServerManagement : MonoBehaviour
         }
     }
  
-    // =========================
     // 공통 GET 요청
-    // =========================
     private IEnumerator Get(string endpoint, Action<bool, string> onComplete)
     {
         using (UnityWebRequest request = UnityWebRequest.Get(serverUrl + endpoint))

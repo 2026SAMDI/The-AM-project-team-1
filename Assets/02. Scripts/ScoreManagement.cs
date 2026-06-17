@@ -34,7 +34,7 @@ public class ScoreManagement : MonoBehaviour
         UpdateUI();
     }
 
-    // 🔥 [추가] 외부에서 최종 점수를 안전하게 읽어갈 수 있도록 통로를 열어줍니다.
+    // 외부에서 최종 점수를 안전하게 읽어갈 수 있도록 함
     public int GetFinalScore()
     {
         return currentScore;
