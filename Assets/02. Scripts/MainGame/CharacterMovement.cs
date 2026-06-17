@@ -34,6 +34,8 @@ public class CharacterMovement : MonoBehaviour
     // 마우스 시점 변환 코드
     public void OnLook(InputAction.CallbackContext ctx)
     {
+        if (OpenMenu.isMenuOpen == true) return;
+        
         Vector2 lookInput = ctx.ReadValue<Vector2>();
         float mouseX = lookInput.x * mouseSensitive;
         float mouseY = lookInput.y * mouseSensitive;

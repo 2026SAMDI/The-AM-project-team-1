@@ -12,6 +12,7 @@ public class PlayerShot : MonoBehaviour
     // InputSystem으로 제작
     public void OnShot(InputAction.CallbackContext ctx)
     {
+        if (OpenMenu.isMenuOpen == true) return;
         if (!ctx.performed) return;
         if (!StartCountdown.canClick) return;
 

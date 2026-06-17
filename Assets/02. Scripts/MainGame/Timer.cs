@@ -126,10 +126,5 @@ public class Timer : MonoBehaviour
         SceneManager.LoadScene("title"); 
     }
 
-    public void resetTimer() 
-    {
-        inGameTimer = 60f;
-        isRunning = true;
-        text.text = "1:00";
-    }
+    public void resetTimer() => isRunning = false;
 }
