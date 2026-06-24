@@ -47,4 +47,8 @@ public class CharacterMovement : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -60f,60f);
         PlayerCamera.localRotation = Quaternion.Euler(xRotation,0,0);
     }
+    public void UpdateSensitivity(float newValue)
+    {
+        mouseSensitive = newValue;
+    }
 }

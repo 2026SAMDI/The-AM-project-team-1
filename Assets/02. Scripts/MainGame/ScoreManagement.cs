@@ -4,7 +4,7 @@ using UnityEngine;
 public class ScoreManagement : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI text;
-    [SerializeField] private int targetScore = 100; 
+    [SerializeField] public int targetScore = 100; 
     [SerializeField] private int missScore = 50; 
     private int currentScore = 0; // 현재 점수
 

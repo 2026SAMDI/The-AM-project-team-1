@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class SpawnTarget : MonoBehaviour
 {
     [SerializeField]private GameObject targetPrefab;
     [SerializeField]private Transform[] spawnPoints;
+    [SerializeField]private ScoreManagement score;
 
     private Queue<int> indexQueue = new Queue<int>(); //스폰포인트 인덱스를 여기에 담아 먼저 넣은걸 꺼내준다.
     private int lastIndex = -1; // 직전에 있던 위치에 다시 소환하지 않게 하는 코드
@@ -33,7 +35,10 @@ public class SpawnTarget : MonoBehaviour
         }
         lastIndex = index; //indexQueue의 앞값을 꺼내옴 예시) indexQueue = [2,0,3]이면 2 먼저 꺼내옴
         
-        Instantiate(targetPrefab, spawnPoints[index].position, Quaternion.identity); // 타겟을 생성함 [index]는 몇번째 위치에 있는지
+        // Instantiate(targetPrefab, spawnPoints[index].position, Quaternion.identity); // 타겟을 생성함 [index]는 몇번째 위치에 있는지
+        GameObject go = Instantiate(targetPrefab, spawnPoints[index].position, Quaternion.identity); 
+
+        ApplyDifficultyScale(go);
     }
 
     private void RefillQueue()
@@ -61,5 +66,26 @@ public class SpawnTarget : MonoBehaviour
             (list[i], list[j]) = (list[j],list[i]); // 위치 교환
         }
     }
+    private void ApplyDifficultyScale(GameObject targetObject)
+{
+    string currentDifficulty = PlayerPrefs.GetString("SelectedDifficulty", "Easy");
     
+    // 기본 크기 지정 (Easy일 때의 배율)
+    float sizeMultiplier = 1.0f;
+
+    if (currentDifficulty == "Normal")
+    {
+        sizeMultiplier = 0.69f; // Easy의 80% 크기
+        score.targetScore = 150;
+    }
+    else if (currentDifficulty == "Hard")
+    {
+        sizeMultiplier = 0.5f; // Easy의 40% 크기
+        score.targetScore = 200;
+    }
+
+    // 타겟 오브젝트의 LocalScale에 배율 곱해주기
+    Vector3 defaultScale = new Vector3(3f, 3f, 3f); 
+    targetObject.transform.localScale = defaultScale * sizeMultiplier;
+}
 }
